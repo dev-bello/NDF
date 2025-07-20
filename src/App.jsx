@@ -1,59 +1,150 @@
-import React, { useState, useEffect } from 'react'
-import SignupLogin from './components/SignupLogin'
-import UnderConstruction from './components/UnderConstruction'
-import './App.css'
+import React, { useState, useEffect } from "react";
+import SignupLogin from "./components/SignupLogin";
+import UnderConstruction from "./components/UnderConstruction";
+import Blog from "./components/Blog";
+import "./App.css";
 
 function App() {
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [activeSection, setActiveSection] = useState('hero')
-  const [currentPage, setCurrentPage] = useState('home')
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("hero");
+  const [currentPage, setCurrentPage] = useState("home");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const scrollToSection = (sectionId) => {
-    document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' })
-    setActiveSection(sectionId)
-  }
+    document.getElementById(sectionId).scrollIntoView({ behavior: "smooth" });
+    setActiveSection(sectionId);
+    setMobileMenuOpen(false);
+  };
 
   const handleRegisterClick = () => {
-    setCurrentPage('signup')
-  }
+    setCurrentPage("signup");
+    setMobileMenuOpen(false);
+  };
 
   const handleMobileAppClick = () => {
-    setCurrentPage('construction')
-  }
+    setCurrentPage("construction");
+    setMobileMenuOpen(false);
+  };
+
+  const handleBlogClick = () => {
+    setCurrentPage("blog");
+    setMobileMenuOpen(false);
+  };
 
   const handleBackToHome = () => {
-    setCurrentPage('home')
+    setCurrentPage("home");
+  };
+
+  if (currentPage === "signup") {
+    return <SignupLogin onBack={handleBackToHome} />;
   }
 
-  if (currentPage === 'signup') {
-    return <SignupLogin onBack={handleBackToHome} />
+  if (currentPage === "construction") {
+    return <UnderConstruction onBack={handleBackToHome} />;
   }
 
-  if (currentPage === 'construction') {
-    return <UnderConstruction onBack={handleBackToHome} />
+  if (currentPage === "blog") {
+    return <Blog onBack={handleBackToHome} />;
   }
+
   return (
     <div className="app">
       {/* Navigation */}
-      <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
+      <nav className={`navbar ${isScrolled ? "scrolled" : ""}`}>
+        {/* Mobile Menu Blur Overlay */}
+        <div
+          className={`mobile-menu-overlay ${mobileMenuOpen ? "open" : ""}`}
+          onClick={() => setMobileMenuOpen(false)}
+        ></div>
+
         <div className="nav-container">
           <div className="nav-logo">
-            <img src="/NDF_logo.jpg" alt="Northern Development Forum Logo" />
+            <img
+              src="/NDF_logo copy.jpg"
+              alt="Northern Development Forum Logo"
+            />
           </div>
           <div className="nav-links">
-            <button onClick={() => scrollToSection('about')} className={activeSection === 'about' ? 'active' : ''}>About</button>
-            <button onClick={() => scrollToSection('objectives')} className={activeSection === 'objectives' ? 'active' : ''}>Objectives</button>
-            <button onClick={() => scrollToSection('leadership')} className={activeSection === 'leadership' ? 'active' : ''}>Leadership</button>
-            <button onClick={() => scrollToSection('technology')} className={activeSection === 'technology' ? 'active' : ''}>Technology</button>
-            <button onClick={() => scrollToSection('join')} className="cta-button">Join Forum</button>
+            <button
+              onClick={() => scrollToSection("about")}
+              className={activeSection === "about" ? "active" : ""}
+            >
+              About
+            </button>
+            <button
+              onClick={() => scrollToSection("objectives")}
+              className={activeSection === "objectives" ? "active" : ""}
+            >
+              Objectives
+            </button>
+            <button
+              onClick={() => scrollToSection("leadership")}
+              className={activeSection === "leadership" ? "active" : ""}
+            >
+              Leadership
+            </button>
+            <button
+              onClick={() => scrollToSection("technology")}
+              className={activeSection === "technology" ? "active" : ""}
+            >
+              Technology
+            </button>
+            <button onClick={handleBlogClick}>Blog</button>
+            <button
+              onClick={() => scrollToSection("join")}
+              className="cta-button"
+            >
+              Join Forum
+            </button>
+          </div>
+          <button
+            className="mobile-menu"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            ☰
+          </button>
+        </div>
+        <div className={`mobile-nav ${mobileMenuOpen ? "open" : ""}`}>
+          <div className="mobile-nav-links">
+            <button
+              onClick={() => scrollToSection("about")}
+              className={activeSection === "about" ? "active" : ""}
+            >
+              About
+            </button>
+            <button
+              onClick={() => scrollToSection("objectives")}
+              className={activeSection === "objectives" ? "active" : ""}
+            >
+              Objectives
+            </button>
+            <button
+              onClick={() => scrollToSection("leadership")}
+              className={activeSection === "leadership" ? "active" : ""}
+            >
+              Leadership
+            </button>
+            <button
+              onClick={() => scrollToSection("technology")}
+              className={activeSection === "technology" ? "active" : ""}
+            >
+              Technology
+            </button>
+            <button onClick={handleBlogClick}>Blog</button>
+            <button
+              onClick={() => scrollToSection("join")}
+              className="cta-button"
+            >
+              Join Forum
+            </button>
           </div>
         </div>
       </nav>
@@ -68,11 +159,16 @@ function App() {
               <span className="highlight"> Regional Development</span>
             </h1>
             <p className="hero-subtitle">
-              The Northern Development Forum is a comprehensive regional platform designed to bridge ethnic divides, 
-              promote inclusive governance, and serve as the trusted voice of our diverse communities.
+              The Northern Development Forum is a comprehensive regional
+              platform designed to bridge ethnic divides, promote inclusive
+              governance, and serve as the trusted voice of our diverse
+              communities.
             </p>
             <div className="hero-buttons">
-              <button onClick={() => scrollToSection('about')} className="btn-primary">
+              <button
+                onClick={() => scrollToSection("about")}
+                className="btn-primary"
+              >
                 Learn More
               </button>
               <button onClick={handleRegisterClick} className="btn-secondary">
@@ -102,38 +198,55 @@ function App() {
         <div className="container">
           <div className="section-header">
             <h2>About the Forum</h2>
-            <p>Addressing historical distrust and building a stronger, unified region</p>
+            <p>
+              Addressing historical distrust and building a stronger, unified
+              region
+            </p>
           </div>
           <div className="about-grid">
             <div className="about-text">
               <h3>Our Foundation</h3>
               <p>
-                The Northern Development Forum was conceived to address the historical factors that have caused 
-                distrust and suspicion among different ethnic groups across our region. Learning from the 
-                experiences of the Middle Belt Forum of old, we've designed a more inclusive and comprehensive approach.
+                The Northern Development Forum was conceived to address the
+                historical factors that have cause suspicions among different
+                ethnic groups and religion which politicians have weaponized via
+                misinformation and manipulation. Learning from the experience of
+                the Northern People Congress of old, we've designed a more
+                inclusive and comprehensive approach.
               </p>
               <h3>Our Structure</h3>
               <p>
-                We operate through a robust dual structure: a strong community-based foundation that directly 
-                engages with grassroots concerns, and a regional framework that interfaces with policy makers 
-                at the federal level to secure the best outcomes for our region.
+                We operate through a robust dual structure: a strong
+                community-based foundation that directly engages with grassroots
+                concerns, and a regional framework that interfaces with policy
+                makers at the federal level to secure the best outcomes for our
+                region.
               </p>
             </div>
             <div className="about-features">
               <div className="feature-card">
                 <div className="feature-icon">🤝</div>
                 <h4>Unity & Inclusion</h4>
-                <p>Bringing together all ethnicities, religions, and political affiliations under one unified voice</p>
+                <p>
+                  Bringing together all ethnicities, religions, and political
+                  affiliations under one unified voice
+                </p>
               </div>
               <div className="feature-card">
                 <div className="feature-icon">🏛️</div>
                 <h4>Policy Interface</h4>
-                <p>Direct engagement with government at all levels for effective policy analysis and implementation</p>
+                <p>
+                  Direct engagement with government at all levels for effective
+                  policy analysis and implementation
+                </p>
               </div>
               <div className="feature-card">
                 <div className="feature-icon">📱</div>
                 <h4>Technology-Driven</h4>
-                <p>Modern platforms for registration, communication, and transparent financial management</p>
+                <p>
+                  Modern platforms for registration, communication, and
+                  transparent financial management
+                </p>
               </div>
             </div>
           </div>
@@ -145,31 +258,37 @@ function App() {
         <div className="container">
           <div className="section-header">
             <h2>Aims & Objectives</h2>
-            <p>Our mission to serve as the bridge between the people and governance</p>
+            <p>
+              Our mission to serve as the bridge between the people and
+              governance
+            </p>
           </div>
           <div className="objectives-grid">
             <div className="objective-card">
               <div className="objective-number">01</div>
               <h3>Policy Design & Advisory</h3>
               <p>
-                Design and suggest comprehensive policies to government based on the unique 
-                peculiarities and specific needs of our region, ensuring local context drives policy formation.
+                Design and suggest comprehensive policies to government based on
+                the unique peculiarities and specific needs of our region,
+                ensuring local context drives policy formation.
               </p>
             </div>
             <div className="objective-card">
               <div className="objective-number">02</div>
               <h3>Government Interface</h3>
               <p>
-                Interface with government at all levels to analyze policies, programs, and bills, 
-                ensuring seamless implementation through quality monitoring and constructive feedback.
+                Interface with government at all levels to analyze policies,
+                programs, and bills, ensuring seamless implementation through
+                quality monitoring and constructive feedback.
               </p>
             </div>
             <div className="objective-card">
               <div className="objective-number">03</div>
               <h3>People's Voice & Information Hub</h3>
               <p>
-                Serve as the trusted forum for accurate information dissemination to the people 
-                while providing a platform for citizens to voice their opinions on government activities.
+                Voice their opinion on government activities and provide
+                professional advice or suggestions on how citizens can further
+                play their part in community development .
               </p>
             </div>
           </div>
@@ -181,7 +300,10 @@ function App() {
         <div className="container">
           <div className="section-header">
             <h2>Leadership Structure</h2>
-            <p>Five-tier democratic governance ensuring representation at every level</p>
+            <p>
+              Five-tier democratic governance ensuring representation at every
+              level
+            </p>
           </div>
           <div className="leadership-structure">
             <div className="level-card regional">
@@ -202,28 +324,43 @@ function App() {
             </div>
             <div className="level-card community">
               <h3>Community Level</h3>
-              <p>Core activities hub: project monitoring, voting, and real-time feedback</p>
+              <p>
+                Core activities hub: project monitoring, voting, and real-time
+                feedback
+              </p>
             </div>
           </div>
-          
+
           <div className="leadership-principles">
             <h3>Leadership Principles</h3>
             <div className="principles-grid">
               <div className="principle">
                 <h4>🔄 Rotational Leadership</h4>
-                <p>Leadership positions rotate among states to ensure equitable representation</p>
+                <p>
+                  Leadership positions rotate among states to ensure equitable
+                  representation
+                </p>
               </div>
               <div className="principle">
                 <h4>🤲 Religious Inclusion</h4>
-                <p>Dedicated representation from both JNI (Muslim) and CAN (Christian) organizations</p>
+                <p>
+                  Dedicated representation from both JNI (Muslim) and CAN
+                  (Christian) organizations
+                </p>
               </div>
               <div className="principle">
                 <h4>🏛️ Political Balance</h4>
-                <p>Clear representation from all major political parties in leadership committees</p>
+                <p>
+                  Clear representation from all major political parties in
+                  leadership committees
+                </p>
               </div>
               <div className="principle">
                 <h4>📱 Digital Democracy</h4>
-                <p>Elections conducted through secure encrypted platforms like WhatsApp and Telegram</p>
+                <p>
+                  Elections conducted through secure encrypted platforms like
+                  WhatsApp and Telegram
+                </p>
               </div>
             </div>
           </div>
@@ -241,27 +378,40 @@ function App() {
             <div className="directorate-card">
               <div className="directorate-icon">🌾</div>
               <h3>Agriculture</h3>
-              <p>Advancing farming technologies, crop production, and rural development initiatives</p>
+              <p>
+                Advancing farming technologies, crop production, and rural
+                development initiatives
+              </p>
             </div>
             <div className="directorate-card">
               <div className="directorate-icon">🏭</div>
               <h3>Industries</h3>
-              <p>Promoting industrial growth, manufacturing, and economic diversification</p>
+              <p>
+                Promoting industrial growth, manufacturing, and economic
+                diversification
+              </p>
             </div>
             <div className="directorate-card">
               <div className="directorate-icon">⚡</div>
               <h3>Power & Energy</h3>
-              <p>Ensuring reliable power supply and sustainable energy solutions</p>
+              <p>
+                Ensuring reliable power supply and sustainable energy solutions
+              </p>
             </div>
             <div className="directorate-card">
               <div className="directorate-icon">🛣️</div>
               <h3>Infrastructure & Works</h3>
-              <p>Overseeing roads, bridges, and critical infrastructure development</p>
+              <p>
+                Overseeing roads, bridges, and critical infrastructure
+                development
+              </p>
             </div>
             <div className="directorate-card">
               <div className="directorate-icon">🎓</div>
               <h3>Education</h3>
-              <p>Advancing educational policies and institutional development</p>
+              <p>
+                Advancing educational policies and institutional development
+              </p>
             </div>
             <div className="directorate-card">
               <div className="directorate-icon">🏥</div>
@@ -277,15 +427,19 @@ function App() {
         <div className="container">
           <div className="section-header">
             <h2>Technology & Transparency</h2>
-            <p>Modern solutions for democratic participation and financial accountability</p>
+            <p>
+              Modern solutions for democratic participation and financial
+              accountability
+            </p>
           </div>
           <div className="technology-grid">
             <div className="tech-feature">
               <h3>📱 Mobile Application</h3>
               <p>
-                A comprehensive mobile app for member registration that seamlessly integrates 
-                all participants with forum social media handles and provides real-time 
-                information dissemination and feedback collection.
+                A comprehensive mobile app for member registration that
+                seamlessly integrates all participants with forum social media
+                handles and provides real-time information dissemination and
+                feedback collection.
               </p>
               <ul>
                 <li>Easy member registration and verification</li>
@@ -297,9 +451,9 @@ function App() {
             <div className="tech-feature">
               <h3>💰 Financial Transparency System</h3>
               <p>
-                A specialized application providing real-time visibility into all financial 
-                transactions, addressing concerns about fund mismanagement and building 
-                community confidence.
+                A specialized application providing real-time visibility into
+                all financial transactions, addressing concerns about fund
+                mismanagement and building community confidence.
               </p>
               <ul>
                 <li>Real-time transaction monitoring</li>
@@ -311,8 +465,9 @@ function App() {
             <div className="tech-feature">
               <h3>🔐 Secure Communication</h3>
               <p>
-                Encrypted platforms for leadership elections and critical decision-making, 
-                ensuring democratic participation while maintaining security and integrity.
+                Encrypted platforms for leadership elections and critical
+                decision-making, ensuring democratic participation while
+                maintaining security and integrity.
               </p>
               <ul>
                 <li>WhatsApp and Telegram integration</li>
@@ -331,8 +486,9 @@ function App() {
           <div className="join-content">
             <h2>Join the Northern Development Forum</h2>
             <p>
-              Be part of the movement that's reshaping our region's future. Together, we can build 
-              a more unified, prosperous, and equitable Northern Nigeria.
+              Be part of the movement that's reshaping our region's future.
+              Together, we can build a more unified, prosperous, and equitable
+              Northern Nigeria.
             </p>
             <div className="join-stats">
               <div className="join-stat">
@@ -349,8 +505,18 @@ function App() {
               </div>
             </div>
             <div className="join-buttons">
-              <button onClick={handleRegisterClick} className="btn-primary large">Register as Member</button>
-              <button onClick={handleMobileAppClick} className="btn-secondary large">Download Mobile App</button>
+              <button
+                onClick={handleRegisterClick}
+                className="btn-primary large"
+              >
+                Register as Member
+              </button>
+              <button
+                onClick={handleMobileAppClick}
+                className="btn-secondary large"
+              >
+                Download Mobile App
+              </button>
             </div>
           </div>
         </div>
@@ -362,29 +528,48 @@ function App() {
           <div className="footer-content">
             <div className="footer-section">
               <h3>Northern Development Forum</h3>
-              <p>Building unity through inclusive regional development and democratic governance.</p>
+              <p>
+                Building unity through inclusive regional development and
+                democratic governance.
+              </p>
             </div>
             <div className="footer-section">
               <h4>Quick Links</h4>
               <ul>
-                <li><a href="#about">About Us</a></li>
-                <li><a href="#objectives">Our Objectives</a></li>
-                <li><a href="#leadership">Leadership</a></li>
-                <li><a href="#technology">Technology</a></li>
+                <li>
+                  <a href="#about">About Us</a>
+                </li>
+                <li>
+                  <a href="#objectives">Our Objectives</a>
+                </li>
+                <li>
+                  <a href="#leadership">Leadership</a>
+                </li>
+                <li>
+                  <a href="#technology">Technology</a>
+                </li>
               </ul>
             </div>
             <div className="footer-section">
               <h4>Contact</h4>
-              <p>Email: info@northerndevelopmentforum.ng</p>
+              <p>Email: info@ndf.ng</p>
               <p>Phone: +234 (0) 123 456 7890</p>
             </div>
             <div className="footer-section">
               <h4>Follow Us</h4>
               <div className="social-links">
-                <a href="#" className="social-link">Facebook</a>
-                <a href="#" className="social-link">Twitter</a>
-                <a href="#" className="social-link">WhatsApp</a>
-                <a href="#" className="social-link">Telegram</a>
+                <a href="#" className="social-link">
+                  Facebook
+                </a>
+                <a href="#" className="social-link">
+                  Twitter
+                </a>
+                <a href="#" className="social-link">
+                  WhatsApp
+                </a>
+                <a href="#" className="social-link">
+                  Telegram
+                </a>
               </div>
             </div>
           </div>
@@ -394,7 +579,7 @@ function App() {
         </div>
       </footer>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
