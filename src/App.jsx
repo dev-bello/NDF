@@ -1,585 +1,529 @@
 import React, { useState, useEffect } from "react";
-import SignupLogin from "./components/SignupLogin";
-import UnderConstruction from "./components/UnderConstruction";
+import Login from "./components/Login";
+import SignUp from "./components/SignUp";
+import UserDashboard from "./components/UserDashboard";
+import AdminDashboard from "./components/AdminDashboard";
 import Blog from "./components/Blog";
+import UnderConstruction from "./components/UnderConstruction";
 import "./App.css";
 
-function App() {
+const App = () => {
+  const [user, setUser] = useState(null);
+  const [view, setView] = useState("home"); // home, login, signup, blog, forum, user-dashboard, admin-dashboard
   const [isScrolled, setIsScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState("hero");
-  const [currentPage, setCurrentPage] = useState("home");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
+
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const userData = JSON.parse(storedUser);
+      setUser(userData);
+      setView(userData.role === "admin" ? "admin-dashboard" : "user-dashboard");
+    }
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToSection = (sectionId) => {
-    document.getElementById(sectionId).scrollIntoView({ behavior: "smooth" });
-    setActiveSection(sectionId);
-    setMobileMenuOpen(false);
+  const handleLogin = (userData) => {
+    localStorage.setItem("user", JSON.stringify(userData));
+    setUser(userData);
+    setView(userData.role === "admin" ? "admin-dashboard" : "user-dashboard");
   };
 
-  const handleRegisterClick = () => {
-    setCurrentPage("signup");
-    setMobileMenuOpen(false);
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+    setView("home");
   };
 
-  const handleMobileAppClick = () => {
-    setCurrentPage("construction");
-    setMobileMenuOpen(false);
+  const handleSignUp = (userData) => {
+    setUser(userData);
+    setView("user-dashboard");
   };
 
-  const handleBlogClick = () => {
-    setCurrentPage("blog");
-    setMobileMenuOpen(false);
+  const renderContent = () => {
+    switch (view) {
+      case "login":
+        return (
+          <div className="page-container">
+            <Login
+              onLogin={handleLogin}
+              onSwitchToSignUp={() => setView("signup")}
+            />
+          </div>
+        );
+      case "signup":
+        return (
+          <div className="page-container">
+            <SignUp
+              onSignUp={handleSignUp}
+              onSwitchToLogin={() => setView("login")}
+            />
+          </div>
+        );
+      case "user-dashboard":
+        return <UserDashboard user={user} onLogout={handleLogout} />;
+      case "admin-dashboard":
+        return <AdminDashboard user={user} onLogout={handleLogout} />;
+      case "blog":
+        return <Blog onBack={() => setView("home")} />;
+      case "forum":
+        return (
+          <div className="page-container">
+            <UnderConstruction onBack={() => setView("home")} />
+          </div>
+        );
+      default:
+        return (
+          <>
+            <Hero onNavigate={setView} />
+            <About />
+            <Objectives />
+            <Leadership />
+            <Directorates />
+            <Technology />
+            <Join onNavigate={setView} />
+          </>
+        );
+    }
   };
-
-  const handleBackToHome = () => {
-    setCurrentPage("home");
-  };
-
-  if (currentPage === "signup") {
-    return <SignupLogin onBack={handleBackToHome} />;
-  }
-
-  if (currentPage === "construction") {
-    return <UnderConstruction onBack={handleBackToHome} />;
-  }
-
-  if (currentPage === "blog") {
-    return <Blog onBack={handleBackToHome} />;
-  }
 
   return (
     <div className="app">
-      {/* Navigation */}
-      <nav className={`navbar ${isScrolled ? "scrolled" : ""}`}>
-        {/* Mobile Menu Blur Overlay */}
-        <div
-          className={`mobile-menu-overlay ${mobileMenuOpen ? "open" : ""}`}
-          onClick={() => setMobileMenuOpen(false)}
-        ></div>
-
-        <div className="nav-container">
-          <div className="nav-logo">
-            <img
-              src="/NDF_logo copy.jpg"
-              alt="Northern Development Forum Logo"
-            />
-          </div>
-          <div className="nav-links">
-            <button
-              onClick={() => scrollToSection("about")}
-              className={activeSection === "about" ? "active" : ""}
-            >
-              About
-            </button>
-            <button
-              onClick={() => scrollToSection("objectives")}
-              className={activeSection === "objectives" ? "active" : ""}
-            >
-              Objectives
-            </button>
-            <button
-              onClick={() => scrollToSection("leadership")}
-              className={activeSection === "leadership" ? "active" : ""}
-            >
-              Leadership
-            </button>
-            <button
-              onClick={() => scrollToSection("technology")}
-              className={activeSection === "technology" ? "active" : ""}
-            >
-              Technology
-            </button>
-            <button onClick={handleBlogClick}>Blog</button>
-            <button
-              onClick={() => scrollToSection("join")}
-              className="cta-button"
-            >
-              Join Forum
-            </button>
-          </div>
-          <button
-            className="mobile-menu"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            ☰
-          </button>
-        </div>
-        <div className={`mobile-nav ${mobileMenuOpen ? "open" : ""}`}>
-          <div className="mobile-nav-links">
-            <button
-              onClick={() => scrollToSection("about")}
-              className={activeSection === "about" ? "active" : ""}
-            >
-              About
-            </button>
-            <button
-              onClick={() => scrollToSection("objectives")}
-              className={activeSection === "objectives" ? "active" : ""}
-            >
-              Objectives
-            </button>
-            <button
-              onClick={() => scrollToSection("leadership")}
-              className={activeSection === "leadership" ? "active" : ""}
-            >
-              Leadership
-            </button>
-            <button
-              onClick={() => scrollToSection("technology")}
-              className={activeSection === "technology" ? "active" : ""}
-            >
-              Technology
-            </button>
-            <button onClick={handleBlogClick}>Blog</button>
-            <button
-              onClick={() => scrollToSection("join")}
-              className="cta-button"
-            >
-              Join Forum
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section id="hero" className="hero">
-        <div className="hero-background"></div>
-        <div className="hero-content">
-          <div className="hero-text">
-            <h1 className="hero-title">
-              Building Unity Through
-              <span className="highlight"> Regional Development</span>
-            </h1>
-            <p className="hero-subtitle">
-              The Northern Development Forum is a comprehensive regional
-              platform designed to bridge ethnic divides, promote inclusive
-              governance, and serve as the trusted voice of our diverse
-              communities.
-            </p>
-            <div className="hero-buttons">
-              <button
-                onClick={() => scrollToSection("about")}
-                className="btn-primary"
-              >
-                Learn More
-              </button>
-              <button onClick={handleRegisterClick} className="btn-secondary">
-                Join the Movement
-              </button>
-            </div>
-          </div>
-          <div className="hero-stats">
-            <div className="stat-card">
-              <h3>5 Levels</h3>
-              <p>Leadership Structure</p>
-            </div>
-            <div className="stat-card">
-              <h3>Unity</h3>
-              <p>Across All Ethnicities</p>
-            </div>
-            <div className="stat-card">
-              <h3>Real-time</h3>
-              <p>Community Feedback</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* About Section */}
-      <section id="about" className="about">
-        <div className="container">
-          <div className="section-header">
-            <h2>About the Forum</h2>
-            <p>
-              Addressing historical distrust and building a stronger, unified
-              region
-            </p>
-          </div>
-          <div className="about-grid">
-            <div className="about-text">
-              <h3>Our Foundation</h3>
-              <p>
-                The Northern Development Forum was conceived to address the
-                historical factors that have cause suspicions among different
-                ethnic groups and religion which politicians have weaponized via
-                misinformation and manipulation. Learning from the experience of
-                the Northern People Congress of old, we've designed a more
-                inclusive and comprehensive approach.
-              </p>
-              <h3>Our Structure</h3>
-              <p>
-                We operate through a robust dual structure: a strong
-                community-based foundation that directly engages with grassroots
-                concerns, and a regional framework that interfaces with policy
-                makers at the federal level to secure the best outcomes for our
-                region.
-              </p>
-            </div>
-            <div className="about-features">
-              <div className="feature-card">
-                <div className="feature-icon">🤝</div>
-                <h4>Unity & Inclusion</h4>
-                <p>
-                  Bringing together all ethnicities, religions, and political
-                  affiliations under one unified voice
-                </p>
-              </div>
-              <div className="feature-card">
-                <div className="feature-icon">🏛️</div>
-                <h4>Policy Interface</h4>
-                <p>
-                  Direct engagement with government at all levels for effective
-                  policy analysis and implementation
-                </p>
-              </div>
-              <div className="feature-card">
-                <div className="feature-icon">📱</div>
-                <h4>Technology-Driven</h4>
-                <p>
-                  Modern platforms for registration, communication, and
-                  transparent financial management
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Objectives Section */}
-      <section id="objectives" className="objectives">
-        <div className="container">
-          <div className="section-header">
-            <h2>Aims & Objectives</h2>
-            <p>
-              Our mission to serve as the bridge between the people and
-              governance
-            </p>
-          </div>
-          <div className="objectives-grid">
-            <div className="objective-card">
-              <div className="objective-number">01</div>
-              <h3>Policy Design & Advisory</h3>
-              <p>
-                Design and suggest comprehensive policies to government based on
-                the unique peculiarities and specific needs of our region,
-                ensuring local context drives policy formation.
-              </p>
-            </div>
-            <div className="objective-card">
-              <div className="objective-number">02</div>
-              <h3>Government Interface</h3>
-              <p>
-                Interface with government at all levels to analyze policies,
-                programs, and bills, ensuring seamless implementation through
-                quality monitoring and constructive feedback.
-              </p>
-            </div>
-            <div className="objective-card">
-              <div className="objective-number">03</div>
-              <h3>People's Voice & Information Hub</h3>
-              <p>
-                Voice their opinion on government activities and provide
-                professional advice or suggestions on how citizens can further
-                play their part in community development .
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Leadership Structure */}
-      <section id="leadership" className="leadership">
-        <div className="container">
-          <div className="section-header">
-            <h2>Leadership Structure</h2>
-            <p>
-              Five-tier democratic governance ensuring representation at every
-              level
-            </p>
-          </div>
-          <div className="leadership-structure">
-            <div className="level-card regional">
-              <h3>Regional Level</h3>
-              <p>Overarching coordination and federal government interface</p>
-            </div>
-            <div className="level-card state">
-              <h3>State Level</h3>
-              <p>State-specific policy implementation and coordination</p>
-            </div>
-            <div className="level-card local">
-              <h3>Local Government Level</h3>
-              <p>Grassroots policy execution and community liaison</p>
-            </div>
-            <div className="level-card ward">
-              <h3>Ward Level</h3>
-              <p>Direct community representation and local issues</p>
-            </div>
-            <div className="level-card community">
-              <h3>Community Level</h3>
-              <p>
-                Core activities hub: project monitoring, voting, and real-time
-                feedback
-              </p>
-            </div>
-          </div>
-
-          <div className="leadership-principles">
-            <h3>Leadership Principles</h3>
-            <div className="principles-grid">
-              <div className="principle">
-                <h4>🔄 Rotational Leadership</h4>
-                <p>
-                  Leadership positions rotate among states to ensure equitable
-                  representation
-                </p>
-              </div>
-              <div className="principle">
-                <h4>🤲 Religious Inclusion</h4>
-                <p>
-                  Dedicated representation from both JNI (Muslim) and CAN
-                  (Christian) organizations
-                </p>
-              </div>
-              <div className="principle">
-                <h4>🏛️ Political Balance</h4>
-                <p>
-                  Clear representation from all major political parties in
-                  leadership committees
-                </p>
-              </div>
-              <div className="principle">
-                <h4>📱 Digital Democracy</h4>
-                <p>
-                  Elections conducted through secure encrypted platforms like
-                  WhatsApp and Telegram
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Directorates */}
-      <section id="directorates" className="directorates">
-        <div className="container">
-          <div className="section-header">
-            <h2>Specialized Directorates</h2>
-            <p>Expert-led committees matching key economic sectors</p>
-          </div>
-          <div className="directorates-grid">
-            <div className="directorate-card">
-              <div className="directorate-icon">🌾</div>
-              <h3>Agriculture</h3>
-              <p>
-                Advancing farming technologies, crop production, and rural
-                development initiatives
-              </p>
-            </div>
-            <div className="directorate-card">
-              <div className="directorate-icon">🏭</div>
-              <h3>Industries</h3>
-              <p>
-                Promoting industrial growth, manufacturing, and economic
-                diversification
-              </p>
-            </div>
-            <div className="directorate-card">
-              <div className="directorate-icon">⚡</div>
-              <h3>Power & Energy</h3>
-              <p>
-                Ensuring reliable power supply and sustainable energy solutions
-              </p>
-            </div>
-            <div className="directorate-card">
-              <div className="directorate-icon">🛣️</div>
-              <h3>Infrastructure & Works</h3>
-              <p>
-                Overseeing roads, bridges, and critical infrastructure
-                development
-              </p>
-            </div>
-            <div className="directorate-card">
-              <div className="directorate-icon">🎓</div>
-              <h3>Education</h3>
-              <p>
-                Advancing educational policies and institutional development
-              </p>
-            </div>
-            <div className="directorate-card">
-              <div className="directorate-icon">🏥</div>
-              <h3>Healthcare</h3>
-              <p>Improving healthcare delivery and medical infrastructure</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Technology Section */}
-      <section id="technology" className="technology">
-        <div className="container">
-          <div className="section-header">
-            <h2>Technology & Transparency</h2>
-            <p>
-              Modern solutions for democratic participation and financial
-              accountability
-            </p>
-          </div>
-          <div className="technology-grid">
-            <div className="tech-feature">
-              <h3>📱 Mobile Application</h3>
-              <p>
-                A comprehensive mobile app for member registration that
-                seamlessly integrates all participants with forum social media
-                handles and provides real-time information dissemination and
-                feedback collection.
-              </p>
-              <ul>
-                <li>Easy member registration and verification</li>
-                <li>Direct integration with social media platforms</li>
-                <li>Real-time notifications and updates</li>
-                <li>Community polling and voting features</li>
-              </ul>
-            </div>
-            <div className="tech-feature">
-              <h3>💰 Financial Transparency System</h3>
-              <p>
-                A specialized application providing real-time visibility into
-                all financial transactions, addressing concerns about fund
-                mismanagement and building community confidence.
-              </p>
-              <ul>
-                <li>Real-time transaction monitoring</li>
-                <li>Donor identification and purpose tracking</li>
-                <li>Expenditure transparency with justifications</li>
-                <li>Automated financial reporting</li>
-              </ul>
-            </div>
-            <div className="tech-feature">
-              <h3>🔐 Secure Communication</h3>
-              <p>
-                Encrypted platforms for leadership elections and critical
-                decision-making, ensuring democratic participation while
-                maintaining security and integrity.
-              </p>
-              <ul>
-                <li>WhatsApp and Telegram integration</li>
-                <li>Encrypted voting mechanisms</li>
-                <li>Multi-level approval workflows</li>
-                <li>Secure document sharing</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Call to Action */}
-      <section id="join" className="join">
-        <div className="container">
-          <div className="join-content">
-            <h2>Join the Northern Development Forum</h2>
-            <p>
-              Be part of the movement that's reshaping our region's future.
-              Together, we can build a more unified, prosperous, and equitable
-              Northern Nigeria.
-            </p>
-            <div className="join-stats">
-              <div className="join-stat">
-                <h3>United</h3>
-                <p>All Ethnicities & Religions</p>
-              </div>
-              <div className="join-stat">
-                <h3>Transparent</h3>
-                <p>Real-time Financial Tracking</p>
-              </div>
-              <div className="join-stat">
-                <h3>Democratic</h3>
-                <p>Community-driven Decisions</p>
-              </div>
-            </div>
-            <div className="join-buttons">
-              <button
-                onClick={handleRegisterClick}
-                className="btn-primary large"
-              >
-                Register as Member
-              </button>
-              <button
-                onClick={handleMobileAppClick}
-                className="btn-secondary large"
-              >
-                Download Mobile App
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="footer">
-        <div className="container">
-          <div className="footer-content">
-            <div className="footer-section">
-              <h3>Northern Development Forum</h3>
-              <p>
-                Building unity through inclusive regional development and
-                democratic governance.
-              </p>
-            </div>
-            <div className="footer-section">
-              <h4>Quick Links</h4>
-              <ul>
-                <li>
-                  <a href="#about">About Us</a>
-                </li>
-                <li>
-                  <a href="#objectives">Our Objectives</a>
-                </li>
-                <li>
-                  <a href="#leadership">Leadership</a>
-                </li>
-                <li>
-                  <a href="#technology">Technology</a>
-                </li>
-              </ul>
-            </div>
-            <div className="footer-section">
-              <h4>Contact</h4>
-              <p>Email: info@ndf.ng</p>
-              <p>Phone: +234 (0) 123 456 7890</p>
-            </div>
-            <div className="footer-section">
-              <h4>Follow Us</h4>
-              <div className="social-links">
-                <a href="#" className="social-link">
-                  Facebook
-                </a>
-                <a href="#" className="social-link">
-                  Twitter
-                </a>
-                <a href="#" className="social-link">
-                  WhatsApp
-                </a>
-                <a href="#" className="social-link">
-                  Telegram
-                </a>
-              </div>
-            </div>
-          </div>
-          <div className="footer-bottom">
-            <p>&copy; 2025 Northern Development Forum. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <Navbar
+        isScrolled={isScrolled}
+        onNavigate={setView}
+        user={user}
+        onLogout={handleLogout}
+      />
+      <main>{renderContent()}</main>
+      {view === "home" && <Footer />}
     </div>
   );
-}
+};
+
+const Navbar = ({ isScrolled, onNavigate, user, onLogout }) => (
+  <nav className={`navbar ${isScrolled ? "scrolled" : ""}`}>
+    <div className="nav-container">
+      <div className="nav-logo" onClick={() => onNavigate("home")}>
+        <img src="/NDF_logo.jpg" alt="NDF Logo" />
+        <h3>Northern Development Forum</h3>
+      </div>
+      <div className="nav-links">
+        <button onClick={() => onNavigate("home")}>Home</button>
+        <button onClick={() => onNavigate("blog")}>Blog</button>
+        <button onClick={() => onNavigate("forum")}>Forum</button>
+        {user ? (
+          <>
+            <button
+              onClick={() =>
+                onNavigate(
+                  user.role === "admin" ? "admin-dashboard" : "user-dashboard"
+                )
+              }
+            >
+              Dashboard
+            </button>
+            <button onClick={onLogout} className="cta-button">
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <button onClick={() => onNavigate("login")}>Login</button>
+            <button onClick={() => onNavigate("signup")} className="cta-button">
+              Register
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  </nav>
+);
+
+const Hero = ({ onNavigate }) => (
+  <section className="hero">
+    <div className="hero-background"></div>
+    <div className="hero-content container">
+      <div className="hero-text">
+        <h1 className="hero-title">
+          Empowering the North, <span className="highlight">Together</span>
+        </h1>
+        <p className="hero-subtitle">
+          The Northern Development Forum (NDF) is a non-profit organization
+          dedicated to the sustainable development and empowerment of
+          communities across Northern Nigeria.
+        </p>
+        <div className="hero-buttons">
+          <button onClick={() => onNavigate("signup")} className="btn-primary">
+            Join the Movement
+          </button>
+          <button onClick={() => onNavigate("blog")} className="btn-secondary">
+            Read Our Blog
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+const Footer = () => (
+  <footer className="footer">
+    <div className="container">
+      <div className="footer-content">
+        <div className="footer-section">
+          <h3>About NDF</h3>
+          <p>
+            The Northern Development Forum is committed to fostering unity,
+            progress, and sustainable development across all communities in
+            Northern Nigeria.
+          </p>
+        </div>
+        <div className="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li>
+              <a href="#">Home</a>
+            </li>
+            <li>
+              <a href="#">Blog</a>
+            </li>
+            <li>
+              <a href="#">Forum</a>
+            </li>
+            <li>
+              <a href="#">Contact Us</a>
+            </li>
+          </ul>
+        </div>
+        <div className="footer-section">
+          <h4>Connect With Us</h4>
+          <div className="social-links">
+            <a href="#" className="social-link">
+              Facebook
+            </a>
+            <a href="#" className="social-link">
+              Twitter
+            </a>
+            <a href="#" className="social-link">
+              LinkedIn
+            </a>
+          </div>
+        </div>
+      </div>
+      <div className="footer-bottom">
+        <p>&copy; 2025 Northern Development Forum. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+);
+
+const About = () => (
+  <section id="about" className="about container">
+    <div className="section-header">
+      <h2>About The Forum</h2>
+      <p>
+        Uniting for progress, the NDF is a non-partisan platform dedicated to
+        the sustainable development and empowerment of communities across
+        Northern Nigeria.
+      </p>
+    </div>
+    <div className="about-grid">
+      <div className="about-text">
+        <h3>Our Vision & Mission</h3>
+        <p>
+          To be the foremost catalyst for sustainable development, unity, and
+          prosperity in Northern Nigeria, creating a future where every
+          community thrives.
+        </p>
+        <p>
+          Our mission is to foster collaboration, drive socio-economic
+          initiatives, and advocate for policies that empower the people of the
+          North, ensuring equitable growth and lasting peace.
+        </p>
+      </div>
+      <div className="about-features">
+        <div className="feature-card">
+          <div className="feature-icon">🤝</div>
+          <h4>Unity & Collaboration</h4>
+          <p>
+            We bridge gaps between communities, leaders, and stakeholders to
+            foster a united front for regional development.
+          </p>
+        </div>
+        <div className="feature-card">
+          <div className="feature-icon">📈</div>
+          <h4>Socio-Economic Growth</h4>
+          <p>
+            We champion initiatives in education, healthcare, agriculture, and
+            technology to create opportunities and improve livelihoods.
+          </p>
+        </div>
+        <div className="feature-card">
+          <div className="feature-icon">📢</div>
+          <h4>Advocacy & Policy</h4>
+          <p>
+            We engage with policymakers to ensure the needs and aspirations of
+            Northern communities are reflected in national development plans.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+const Objectives = () => (
+  <section id="objectives" className="objectives container">
+    <div className="section-header">
+      <h2>Our Core Objectives</h2>
+      <p>
+        Guided by a commitment to tangible impact, we focus on key areas that
+        are critical for the region's transformation.
+      </p>
+    </div>
+    <div className="objectives-grid">
+      <div className="objective-card">
+        <div className="objective-number">01</div>
+        <h3>Human Capital Development</h3>
+        <p>
+          Investing in education, skills acquisition, and healthcare to unlock
+          the full potential of our people.
+        </p>
+      </div>
+      <div className="objective-card">
+        <div className="objective-number">02</div>
+        <h3>Economic Empowerment</h3>
+        <p>
+          Promoting entrepreneurship, modernizing agriculture, and attracting
+          investment to create a vibrant and resilient economy.
+        </p>
+      </div>
+      <div className="objective-card">
+        <div className="objective-number">03</div>
+        <h3>Infrastructure & Technology</h3>
+        <p>
+          Advocating for and supporting the development of critical
+          infrastructure and the adoption of technology to drive progress.
+        </p>
+      </div>
+      <div className="objective-card">
+        <div className="objective-number">04</div>
+        <h3>Peace & Security</h3>
+        <p>
+          Fostering dialogue and community-led initiatives to address security
+          challenges and promote lasting peace.
+        </p>
+      </div>
+      <div className="objective-card">
+        <div className="objective-number">05</div>
+        <h3>Good Governance</h3>
+        <p>
+          Encouraging transparency, accountability, and inclusive participation
+          in governance at all levels.
+        </p>
+      </div>
+      <div className="objective-card">
+        <div className="objective-number">06</div>
+        <h3>Cultural Preservation</h3>
+        <p>
+          Celebrating and preserving the rich cultural heritage of Northern
+          Nigeria as a foundation for unity and identity.
+        </p>
+      </div>
+    </div>
+  </section>
+);
+
+const Leadership = () => (
+  <section id="leadership" className="leadership container">
+    <div className="section-header">
+      <h2>Our Leadership Structure</h2>
+      <p>
+        A multi-tiered, community-centric governance model ensures grassroots
+        participation and effective coordination.
+      </p>
+    </div>
+    <div className="leadership-structure">
+      <div className="level-card regional">
+        <h3>Regional Executive Council</h3>
+        <p>Oversees the overall strategy and direction of the Forum.</p>
+      </div>
+      <div className="level-card state">
+        <h3>State Chapters</h3>
+        <p>Coordinates activities and initiatives within each state.</p>
+      </div>
+      <div className="level-card local">
+        <h3>LGA Coordinations</h3>
+        <p>Manages local-level projects and community engagement.</p>
+      </div>
+      <div className="level-card ward">
+        <h3>Ward Representatives</h3>
+        <p>Acts as the primary link between the Forum and the communities.</p>
+      </div>
+      <div className="level-card community">
+        <h3>Community Leaders</h3>
+        <p>Drives progress at the very heart of our operations.</p>
+      </div>
+    </div>
+    <div className="leadership-principles">
+      <h3>Guiding Principles</h3>
+      <div className="principles-grid">
+        <div className="principle">
+          <h4>Inclusivity</h4>
+          <p>
+            Every voice matters, from the village square to the state house.
+          </p>
+        </div>
+        <div className="principle">
+          <h4>Transparency</h4>
+          <p>Openness and accountability in all our dealings.</p>
+        </div>
+        <div className="principle">
+          <h4>Collaboration</h4>
+          <p>Partnership with government, private sector, and CSOs.</p>
+        </div>
+        <div className="principle">
+          <h4>Sustainability</h4>
+          <p>Creating solutions that stand the test of time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+const Directorates = () => (
+  <section id="directorates" className="directorates container">
+    <div className="section-header">
+      <h2>Our Directorates</h2>
+      <p>
+        Specialized teams driving focused action in critical development areas.
+      </p>
+    </div>
+    <div className="directorates-grid">
+      <div className="directorate-card">
+        <div className="directorate-icon">📚</div>
+        <h3>Education & Human Capital</h3>
+        <p>
+          Focused on improving access to quality education and vocational
+          training.
+        </p>
+      </div>
+      <div className="directorate-card">
+        <div className="directorate-icon">💼</div>
+        <h3>Economic Development & Investment</h3>
+        <p>
+          Dedicated to fostering entrepreneurship and attracting investment.
+        </p>
+      </div>
+      <div className="directorate-card">
+        <div className="directorate-icon">🌱</div>
+        <h3>Agriculture & Food Security</h3>
+        <p>
+          Working to modernize agricultural practices and ensure food security.
+        </p>
+      </div>
+      <div className="directorate-card">
+        <div className="directorate-icon">💻</div>
+        <h3>Science & Technology</h3>
+        <p>
+          Promoting digital literacy and the adoption of innovative
+          technologies.
+        </p>
+      </div>
+      <div className="directorate-card">
+        <div className="directorate-icon">🕊️</div>
+        <h3>Peace, Security & Reconciliation</h3>
+        <p>
+          Building bridges and fostering dialogue for a more peaceful region.
+        </p>
+      </div>
+      <div className="directorate-card">
+        <div className="directorate-icon">🏛️</div>
+        <h3>Governance & Strategy</h3>
+        <p>Ensuring effective planning, execution, and accountability.</p>
+      </div>
+    </div>
+  </section>
+);
+
+const Technology = () => (
+  <section id="technology" className="technology container">
+    <div className="section-header">
+      <h2>Leveraging Technology for Impact</h2>
+      <p>
+        Our digital platform is the backbone of our operations, enabling
+        seamless coordination and transparent communication.
+      </p>
+    </div>
+    <div className="technology-grid">
+      <div className="tech-feature">
+        <h3>The NDF Digital Platform</h3>
+        <p>
+          A comprehensive mobile and web application designed to connect our
+          members, manage projects, and disseminate information effectively.
+        </p>
+        <ul>
+          <li>Member Registration & Management</li>
+          <li>Real-time Communication Channels</li>
+          <li>Project & Task Management</li>
+          <li>Data Collection & Analytics</li>
+          <li>Resource Sharing & Collaboration</li>
+        </ul>
+      </div>
+      <div className="tech-feature">
+        <h3>Data-Driven Development</h3>
+        <p>
+          We utilize technology to gather and analyze data, ensuring our
+          interventions are evidence-based and impactful.
+        </p>
+        <ul>
+          <li>Community Needs Assessment Surveys</li>
+          <li>Project Impact Tracking</li>
+          <li>Demographic & Economic Data Analysis</li>
+          <li>GIS Mapping of Projects & Resources</li>
+          <li>Transparent Reporting Dashboards</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+);
+
+const Join = ({ onNavigate }) => (
+  <section id="join" className="join">
+    <div className="join-content container">
+      <h2>Become a Part of the Solution</h2>
+      <p>
+        Your skills, passion, and commitment can make a real difference. Join us
+        in building a brighter future for Northern Nigeria.
+      </p>
+      <div className="join-stats">
+        <div className="join-stat">
+          <h3>19</h3>
+          <p>States</p>
+        </div>
+        <div className="join-stat">
+          <h3>419</h3>
+          <p>LGAs</p>
+        </div>
+        <div className="join-stat">
+          <h3>10,000+</h3>
+          <p>Communities</p>
+        </div>
+      </div>
+      <div className="join-buttons">
+        <button onClick={() => onNavigate("signup")} className="btn-primary">
+          Register as a Member
+        </button>
+        <button onClick={() => onNavigate("forum")} className="btn-secondary">
+          Join the Conversation
+        </button>
+      </div>
+    </div>
+  </section>
+);
 
 export default App;
